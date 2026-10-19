@@ -51,7 +51,9 @@ h1{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.7)}.sub{color:#d5dcec;text-shado
 .hide{display:none}
 label.sw{display:flex;gap:6px;align-items:center;font-size:14px}
 .cfgw{position:relative}.pop{position:absolute;right:0;top:calc(100% + 6px);z-index:20;min-width:250px;display:grid;gap:6px;padding:8px;border-radius:14px;border:1px solid var(--bd);background:var(--card);backdrop-filter:blur(10px);box-shadow:0 8px 28px rgba(0,0,0,.35)}.pop button{text-align:left;width:100%}
-.pop.hide{display:none}.vol{display:grid;gap:4px;font-size:14px;padding:4px 8px 6px;color:var(--tx)}.vol input{width:100%;accent-color:var(--ac2)}
+.pop.hide{display:none}
+main{transition:opacity .35s}html.bgonly main{opacity:0;visibility:hidden;transition:opacity .35s,visibility 0s .35s}
+#bgv{position:fixed;left:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:5;border-radius:99px;padding:8px 14px;font-size:13px;background:rgba(10,16,30,.72);color:#fff;border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(6px);cursor:pointer}#bgv:hover{background:rgba(10,16,30,.88)}.vol{display:grid;gap:4px;font-size:14px;padding:4px 8px 6px;color:var(--tx)}.vol input{width:100%;accent-color:var(--ac2)}
 .tabd{display:none}.kbd{display:none}
 .opts button.sel{background:var(--ac2);border-color:var(--ac2);color:#fff}.chips button.an{background:var(--ac2);border-color:var(--ac2);color:#fff}.chips button.cur{outline:2px solid var(--ac)}
 @media(min-width:1000px){main{max-width:1180px}#cols{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:16px;align-items:start}.tabm{display:none}.tabd{display:flex}.kbd{display:block}#colR{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}}
@@ -101,6 +103,7 @@ go.onclick=function(){sp.classList.add("out");var m=document.querySelector("main
 </script>
 <canvas id="sky" aria-hidden="true"></canvas>
 <div id="hud" aria-live="polite"></div>
+<button id="bgv" type="button" aria-pressed="false" title="Chỉ xem nền (Esc để quay lại)">🖼 Xem nền</button>
 <main inert>
 <div class="top"><div><h1>🎧 Luyện nghe tiếng Nga</h1><p class="sub">Ôn thi tốt nghiệp K57 · Nghe 1 (79 câu) và Nghe 2 (50 câu)<br>🚀 Chạm hoặc bấm vào nền để phóng tên lửa.</p></div><div class="cfgw"><button id="cfg" aria-haspopup="true" aria-expanded="false">⚙ Cài đặt</button><div id="cfgp" class="pop hide"><button id="sfx"></button><label class="vol">🚀 Âm lượng hiệu ứng tên lửa<input type="range" id="vs" min="0" max="100"></label><button id="amb"></button><label class="vol">🎵 Âm lượng nhạc nền<input type="range" id="vm" min="0" max="100"></label><button id="anim"></button><button id="tg">🌓 Đổi giao diện sáng/tối</button></div></div></div>
 
@@ -445,12 +448,13 @@ $("exc").onclick=function(e){var b=e.target.closest("button");if(!b)return;var x
 function clk(q){var b=document.querySelector(q);if(b&&!b.disabled)b.click()}
 document.addEventListener("keydown",function(e){
   if(document.getElementById("splash")||e.ctrlKey||e.metaKey||e.altKey)return;var tg=e.target;if(tg&&/^(INPUT|SELECT|TEXTAREA)$/.test(tg.tagName)&&tg.type!=="checkbox")return;
-  if(e.key==="Escape"){$("cfgp").classList.add("hide");return}
+  if(e.key==="Escape"){$("cfgp").classList.add("hide");if(document.documentElement.classList.contains("bgonly"))$("bgv").click();return}if(document.documentElement.classList.contains("bgonly"))return;
   var act=isDesk()?LT:(CT==="play"||CT==="exam"?CT:null),k=e.key;if(!act)return;
   var sc=act==="exam"?"#exc [data-x=":"#card [data-a=",pk=act==="exam"?'#exc [data-x=pick][data-i="'+(k-1)+'"]':"#card .opts button:nth-child("+k+")";
   if(act==="exam"&&(!E||E.done))return;
   var go=k===" "?sc+"play]":k==="Enter"||k==="ArrowRight"?sc+"next]":k==="ArrowLeft"?sc+"prev]":(k>="1"&&k<="4")?pk:null;
   if(!go)return;if(tg&&tg.tagName==="BUTTON")tg.blur();e.preventDefault();clk(go)});
+$("bgv").onclick=function(){var on=document.documentElement.classList.toggle("bgonly");this.textContent=on?"↩ Quay lại":"🖼 Xem nền";this.setAttribute("aria-pressed",on?"true":"false");$("cfgp").classList.add("hide")};
 $("cfg").onclick=function(){var h=$("cfgp").classList.toggle("hide");$("cfg").setAttribute("aria-expanded",h?"false":"true")};
 document.addEventListener("click",function(e){if(!e.target.closest("#cfg,#cfgp"))$("cfgp").classList.add("hide")});
 function applyAnim(){document.documentElement.classList.toggle("noanim",P.anim===false);startLoop()}
