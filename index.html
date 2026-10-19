@@ -43,6 +43,7 @@ input[type=search]{width:100%}
 .bar{height:8px;border-radius:99px;background:var(--bd);overflow:hidden;margin:6px 0 12px}.bar i{display:block;height:100%;background:var(--ok)}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
 .stat{background:var(--bg);border-radius:12px;padding:10px;text-align:center}.stat b{display:block;font-size:20px}.stat span{font-size:12px;color:var(--mu)}
+.stabs{display:flex;gap:6px;margin:0 0 12px}.stabs button{flex:1}.stabs button.on{background:var(--ac2);border-color:var(--ac2);color:#fff}
 .tp{border-top:1px solid var(--bd);padding:12px 0}.tp:first-of-type{border-top:0}.tp .chips{margin:6px 0 8px}.tp button.p{padding:6px 12px;font-size:14px}.code{display:inline-block;background:var(--ac2);color:#fff;border-radius:8px;padding:1px 8px;font-size:13px;margin-right:6px}.warn{background:var(--hi);border-radius:10px;padding:8px 10px;font-size:14px;margin:8px 0}h2{font-size:18px;margin:6px 0 10px}h3{font-size:15px;margin:10px 0 2px;color:var(--ac2)}.tabs button{padding:9px 6px}
 canvas#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block}
 h1{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.7)}.sub{color:#d5dcec;text-shadow:0 1px 6px rgba(0,0,0,.7)}
@@ -105,7 +106,7 @@ go.onclick=function(){sp.classList.add("out");var m=document.querySelector("main
 <div id="hud" aria-live="polite"></div>
 <button id="bgv" type="button" aria-pressed="false" title="Chỉ xem nền (Esc để quay lại)">🖼 Xem nền</button>
 <main inert>
-<div class="top"><div><h1>🎧 Luyện nghe tiếng Nga</h1><p class="sub">Ôn thi tốt nghiệp K57 · Nghe 1 (79 câu) và Nghe 2 (50 câu)<br>🚀 Chạm hoặc bấm vào nền để phóng tên lửa.</p></div><div class="cfgw"><button id="cfg" aria-haspopup="true" aria-expanded="false">⚙ Cài đặt</button><div id="cfgp" class="pop hide"><button id="sfx"></button><label class="vol">🚀 Âm lượng hiệu ứng tên lửa<input type="range" id="vs" min="0" max="100"></label><button id="amb"></button><label class="vol">🎵 Âm lượng nhạc nền<input type="range" id="vm" min="0" max="100"></label><button id="anim"></button><button id="tg">🌓 Đổi giao diện sáng/tối</button></div></div></div>
+<div class="top"><div><h1>🎧 Luyện nghe tiếng Nga</h1><p class="sub">Ôn thi tốt nghiệp K57 · Nghe 1 (79 câu) và Nghe 2 (50 câu)<br>🚀 Bấm trái hoặc chạm vào nền: phóng tên lửa · 🎆 Bấm phải (hoặc giữ lâu trên điện thoại): bắn pháo hoa.</p></div><div class="cfgw"><button id="cfg" aria-haspopup="true" aria-expanded="false">⚙ Cài đặt</button><div id="cfgp" class="pop hide"><button id="sfx"></button><label class="vol">🚀 Âm lượng hiệu ứng tên lửa<input type="range" id="vs" min="0" max="100"></label><button id="amb"></button><label class="vol">🎵 Âm lượng nhạc nền<input type="range" id="vm" min="0" max="100"></label><button id="anim"></button><button id="tg">🌓 Đổi giao diện sáng/tối</button></div></div></div>
 
 <div class="tabs tabm" id="tabs"><button data-t="play" class="on">Luyện tập</button><button data-t="exam">Thi thử</button><button data-t="topic">Chủ đề</button><button data-t="list">Danh sách</button><button data-t="stats">Tiến độ</button></div>
 
@@ -150,12 +151,12 @@ var $=function(i){return document.getElementById(i)};
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function id(d){return d.s+"-"+d.n}
 function last(d){var x=P.st[id(d)];return x?x.l:null}
-var Q=[],qi=0,done=false,picked=-1,opts=[];
+var Q=[],qi=0,done=false,picked=-1,opts=[],RS={};
 function shuffle(a){return a.slice().sort(function(){return Math.random()-.5})}
 function build(startId){
   var s=$("set").value,L=D.filter(function(d){if(s==="topic")return !!CUR&&CUR.ids.indexOf(id(d))>=0;if(s==="1"||s==="2")return d.s==+s;if(s==="wrong")return last(d)===0;if(s==="new")return last(d)===null;return true});
   if($("ord").value==="rnd")L=shuffle(L);
-  Q=L;qi=0;
+  Q=L;qi=0;RS={};
   if(startId){var k=Q.findIndex(function(d){return id(d)===startId});if(k>=0)qi=k}
   show()}
 function speak(t){try{var u=new SpeechSynthesisUtterance(t);u.lang="ru-RU";u.rate=+P.rate;var v=speechSynthesis.getVoices().filter(function(v){return /^ru/i.test(v.lang)})[0];if(v)u.voice=v;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
@@ -176,17 +177,24 @@ function show(){
     opts=shuffle(o);
     h+='<div class="opts">'+opts.map(function(x,i){return '<button data-a="pick" data-i="'+i+'">'+esc(x.a)+(P.vi?'<span>'+esc(x.av)+'</span>':'')+'</button>'}).join("")+'</div><div id="rv"></div>'}
   else h+='<div class="row" style="margin-top:12px"><button data-a="rev">Hiện đáp án</button></div><div id="rv"></div>';
-  h+='<div class="row" style="margin-top:12px;justify-content:space-between"><button data-a="prev">← Trước</button><button data-a="next">Câu tiếp →</button></div>';
+  h+='<div class="row" style="margin-top:12px;justify-content:space-between"><button data-a="prev">← Trước</button>'+(qi===Q.length-1?'<button class="p" data-a="fin">Hoàn thành ✓</button>':'<button data-a="next">Câu tiếp →</button>')+'</div>';
   c.innerHTML=h}
+function finish(){stop();var ids=Object.keys(RS),ok=ids.filter(function(k){return RS[k]}).length,N=Q.length,bad=ids.length-ok,sk=N-ids.length;
+  var h='<h2>Hoàn thành</h2><div class="stats"><div class="stat"><b>'+ok+'/'+N+'</b><span>Câu đúng</span></div><div class="stat"><b>'+bad+'</b><span>Câu sai</span></div><div class="stat"><b>'+sk+'</b><span>Chưa làm</span></div></div>';
+  h+='<div class="row" style="margin-top:12px"><button class="p" data-a="redo">🔁 Làm lại</button>'+((bad+sk)?'<button data-a="redow">Làm lại câu sai/chưa làm ('+(bad+sk)+')</button>':'')+'<button data-a="prev">← Xem lại</button>'+($("set").value==="topic"?'<button data-a="totopic">Về danh sách chủ đề</button>':'')+'</div>';
+  $("card").innerHTML=h}
 function rec(d,ok,nb){var k=id(d),x=P.st[k]||{o:0,b:0,l:null};if(ok)x.o++;else x.b++;x.l=ok?1:0;P.st[k]=x;sv();if(!nb)battle(ok)}
 $("card").onclick=function(e){
   var b=e.target.closest("button");if(!b)return;var a=b.dataset.a,d=Q[qi];if(!d)return;
   if(a==="play")speak(d.t);else if(a==="spq")speak(d.q);else if(a==="stop")stop();
+  else if(a==="fin")finish();else if(a==="redo")build();
+  else if(a==="redow"){Q=Q.filter(function(x){return RS[id(x)]!==true});qi=0;RS={};show()}
+  else if(a==="totopic")tab("topic");
   else if(a==="prev"){qi=(qi-1+Q.length)%Q.length;show()}
   else if(a==="next"){qi=(qi+1)%Q.length;show()}
   else if(a==="rev"){$("rv").innerHTML=reveal(d)+(done?'':'<div class="row"><button class="g" data-a="ok">✓ Mình trả lời đúng</button><button class="r" data-a="no">✗ Chưa đúng</button></div>');b.classList.add("hide")}
-  else if(a==="ok"||a==="no"){if(done)return;done=true;rec(d,a==="ok");$("rv").innerHTML=reveal(d)+'<p class="small">'+(a==="ok"?"Đã ghi nhận: đúng.":"Đã ghi nhận: cần ôn lại.")+'</p>'}
-  else if(a==="pick"){if(done)return;done=true;var i=+b.dataset.i,ok=opts[i].a===d.a;rec(d,ok);
+  else if(a==="ok"||a==="no"){if(done)return;done=true;RS[id(d)]=(a==="ok");rec(d,a==="ok");$("rv").innerHTML=reveal(d)+'<p class="small">'+(a==="ok"?"Đã ghi nhận: đúng.":"Đã ghi nhận: cần ôn lại.")+'</p>'}
+  else if(a==="pick"){if(done)return;done=true;var i=+b.dataset.i,ok=opts[i].a===d.a;RS[id(d)]=ok;rec(d,ok);
     [].forEach.call(document.querySelectorAll(".opts button"),function(x,k){if(opts[k].a===d.a)x.classList.add("ok");else if(k===i)x.classList.add("bad")});
     $("rv").innerHTML=reveal(d);speak(d.t)}};
 function chips(el,L){el.innerHTML=L.map(function(d){var l=last(d);return '<button class="'+(l===1?"ok":l===0?"bad":"")+'" data-id="'+id(d)+'" title="Nghe '+d.s+'">'+(d.s===2?"2.":"1.")+d.n+'</button>'}).join("")||'<span class="small">Chưa có.</span>'}
@@ -210,24 +218,23 @@ function rt(){var d=isDesk();["play","exam","topic","list","stats"].forEach(func
 var CUR=null;
 var TP=[
 {s:1,g:"",i:[["1.1","Ernesto – Evgeny",[1,17,33,49,65]],["1.2","Pskov và Veliky Novgorod",[2,18,34,50,66]],["1.3","Sanatorium (khu nghỉ dưỡng, điều dưỡng)",[3,19,35,51,67]],["1.4","Alexander Borodin",[4,20,36,52,68]],["1.5","Truyền hình và báo chí",[5,21,37,53]],["1.6","Carlos và Lena",[6,22,38,54,69]],["1.7","Bức chân dung gia đình",[7,23,39,55,70]],["1.8","Trung tâm thương mại GUM",[8,24,40,56,71]],["1.9","Mozart",[9,25,41,57,72]],["1.10","Rachmaninov",[10,26,42,58,73]],["1.11","Tiểu sử người phụ nữ / Bồ Đào Nha",[11,27,43,59,74]],["1.12","Moskva",[12,28,44,60,75]],["1.13","Chuyến thăm Kirill",[13,29,45,61,76]],["1.14","Chuyến du lịch Iceland",[14,30,46,62,77]],["1.15","Amsterdam",[15,31,47,63,78]],["1.16","Arnold và Francesca",[16,32,48,64,79]]]},
-{s:2,g:"",w:"Các chủ đề có dấu ⚠️ được ghi chú “Không chấm” trong dữ liệu trước đó; không nên mặc định đáp án đầu tiên là đúng.",i:[["2.1","Peterburg – Питер",[1,30,34,45]],["2.2","Pskov và vùng Novgorod",[2,10,12]],["2.3","Chuyến tham quan – Экскурсия",[2,12]],["2.4","Nina – Нина",[3,21,35,46]],["2.5","Bà / người bà",[4,14,20,26,31]],["2.6","Bài nghe cùng nội dung với chủ đề 2.5",[4,14,26,31]],["2.7","Tiểu sử người phụ nữ / Bồ Đào Nha",[6,37,47,50]],["2.8","Một ngày làm việc của cô giáo",[7,15,41,43],1],["2.9","Bài nghe về chuyến đi và bạn bè",[8,16,18,22,33]],["2.10","Zvenigorod",[8,16,18,22,33]],["2.11","Maria – học tập và làm thêm",[9,25,42,44],1],["2.12","Cuộc sống ở làng quê và ngôi nhà mới",[11,24,27,40],1],["2.13","Dmitry và Alexander – thể thao",[13,28,39,49],1],["2.14","Amsterdam",[17,32]],["2.15","Misha bị ốm",[19,29,38,48],1],["2.16","Bài nghe liên quan đến chỗ ở",[32]],["2.17","Bạn gái người Nga",[34]],["2.18","Tiếng Anh / tiểu sử người phụ nữ",[37,50]]]}
+{s:2,g:"",w:"Các chủ đề có dấu ⚠️ được ghi chú “Không chấm” trong dữ liệu trước đó; không nên mặc định đáp án đầu tiên là đúng.",i:[["2.1","Peterburg – Питер",[1,30,34,45]],["2.2","Chuyến tham quan – Экскурсия",[2,10,12]],["2.3","Nina – Нина",[3,21,35,46]],["2.4","Bà / người bà",[4,14,20,26,31]],["2.5","Amsterdam",[5,17,32,36]],["2.6","Tiểu sử người phụ nữ / Bồ Đào Nha",[6,37,47,50]],["2.7","Một ngày làm việc của cô giáo",[7,15,23,41,43],1],["2.8","Zvenigorod",[8,16,18,22,33]],["2.9","Maria – học tập và làm thêm",[9,25,42,44],1],["2.10","Cuộc sống ở làng quê và ngôi nhà mới",[11,24,27,40],1],["2.11","Dmitry và Alexander – thể thao",[13,28,39,49],1],["2.12","Misha bị ốm",[19,29,38,48],1]]}
 ];
-var UN=[
-{s:2,q:[5,36],r:"",n:"Chưa xác định chắc chắn thuộc bài nào."},
-{s:2,q:[23],r:"Có khả năng thuộc chủ đề 2.8",n:"Dữ liệu chưa xác nhận giờ kết thúc ngày làm việc."}
-];
+var UN=[];
 function qch(s,qs){return qs.map(function(n){var d=D.filter(function(x){return x.s===s&&x.n===n})[0];if(!d)return "";var l=last(d);return '<button class="'+(l===1?"ok":l===0?"bad":"")+'" data-id="'+id(d)+'">'+n+'</button>'}).join("")}
-function topics(){var h="",ps=0;
+var TS=1;
+function topics(){var h='<div class="stabs"><button data-ts="1"'+(TS===1?' class="on"':'')+'>Nghe 1</button><button data-ts="2"'+(TS===2?' class="on"':'')+'>Nghe 2</button></div>';
   TP.forEach(function(g,gi){
-    if(g.s!==ps){ps=g.s;h+='<h2>Nghe '+g.s+'</h2>'}
+    if(g.s!==TS)return;
     h+=(g.g?'<h3>'+esc(g.g)+'</h3>':'')+(g.w?'<div class="warn">⚠️ '+esc(g.w)+'</div>':'');
     g.i.forEach(function(it,ii){var ids=it[2].map(function(n){return g.s+"-"+n}),ok=ids.filter(function(k){var x=P.st[k];return x&&x.l===1}).length;
       h+='<div class="tp"><div><span class="code">'+it[0]+'</span><b>'+esc(it[1])+'</b>'+(it[3]?' <span class="small">⚠️ chưa xác minh</span>':'')+'</div><div class="small">Câu: '+it[2].length+' · đang đúng '+ok+'/'+it[2].length+'</div><div class="chips">'+qch(g.s,it[2])+'</div><button class="p" data-top="'+gi+'-'+ii+'" data-m="quiz">📝 Trắc nghiệm</button> <button data-top="'+gi+'-'+ii+'" data-m="self">Tự kiểm tra</button> <button data-ex="'+gi+'-'+ii+'">⏱ Thi thử</button></div>'})});
-  h+='<h2>Câu chưa xác định chắc chắn</h2><div class="warn">Các câu dưới đây không nên xem là đã ghép chắc chắn với bài nghe.</div>';
-  UN.forEach(function(u){h+='<div class="tp"><div><b>Nghe '+u.s+' · câu '+u.q.join(", ")+'</b>'+(u.r?' <span class="small">('+esc(u.r)+')</span>':'')+'</div><div class="small">'+esc(u.n)+'</div><div class="chips">'+qch(u.s,u.q)+'</div></div>'});
-  h+='<h2>Cách ôn tập</h2><p><b>Nghe 1.</b> Ôn lần lượt các chủ đề từ 1.1 đến 1.16 theo thứ tự câu hỏi.</p><p><b>Nghe 2.</b> Ôn lần lượt các chủ đề từ 2.1 đến 2.18; các chủ đề có dấu ⚠️ cần kiểm tra lại đáp án.</p>';
+  if(UN.length)h+='<h2>Câu chưa xác định chắc chắn</h2><div class="warn">Các câu dưới đây không nên xem là đã ghép chắc chắn với bài nghe.</div>';
+  UN.filter(function(u){return u.s===TS}).forEach(function(u){h+='<div class="tp"><div><b>Nghe '+u.s+' · câu '+u.q.join(", ")+'</b>'+(u.r?' <span class="small">('+esc(u.r)+')</span>':'')+'</div><div class="small">'+esc(u.n)+'</div><div class="chips">'+qch(u.s,u.q)+'</div></div>'});
+  h+='<h2>Cách ôn tập</h2>'+(TS===1?'<p><b>Nghe 1.</b> Ôn lần lượt các chủ đề từ 1.1 đến 1.16 theo thứ tự câu hỏi.</p>':'<p><b>Nghe 2.</b> Ôn lần lượt các chủ đề từ 2.1 đến 2.12; các chủ đề có dấu ⚠️ cần kiểm tra lại đáp án.</p>');
   $("tpc").innerHTML=h}
 $("t-topic").onclick=function(e){var b=e.target.closest("button");if(!b)return;
+  if(b.dataset.ts){TS=+b.dataset.ts;topics();return}
   if(b.dataset.top){var p=b.dataset.top.split("-"),g=TP[+p[0]],it=g.i[+p[1]];CUR={ids:it[2].map(function(n){return g.s+"-"+n})};
     var o=document.querySelector('#set option[value="topic"]');if(!o){o=document.createElement("option");o.value="topic";$("set").appendChild(o)}
     o.textContent="Chủ đề "+it[0]+": "+it[1];$("set").value="topic";$("ord").value="seq";$("mode").value=b.dataset.m||"self";tab("play");build()}
@@ -305,7 +312,7 @@ function step(){tt++;var i;
   SM.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.vx*=.985;p.vy=p.vy*.99-.004;p.r+=p.gr;p.l--});SM=SM.filter(function(p){return p.l>0});var cap=W<700?220:380;if(SM.length>cap)SM.splice(0,SM.length-cap);
   FX.forEach(function(p){p.l--;if(p.k==="sp"){p.x+=p.vx;p.y+=p.vy;p.vy+=.06;p.vx*=.99}});FX=FX.filter(function(p){return p.l>0});
   DB.forEach(function(d){d.x+=d.vx;d.y+=d.vy;d.vy+=.14;d.r+=d.vr;d.l--;if(d.y>GY){d.y=GY;d.vy*=-.3;d.vx*=.6}});DB=DB.filter(function(d){return d.l>0});
-  stepPL();if(fl>0)fl--;if(sh>0)sh--}
+  stepPL();stepFW();if(fl>0)fl--;if(sh>0)sh--}
 function lg(y0,y1,st){var g=cx.createLinearGradient(0,y0,0,y1);st.forEach(function(s){g.addColorStop(s[0],s[1])});return g}
 function poly(p,fill,stroke){cx.beginPath();cx.moveTo(p[0][0],p[0][1]);for(var i=1;i<p.length;i++)cx.lineTo(p[i][0],p[i][1]);cx.closePath();cx.fillStyle=fill;cx.fill();if(stroke){cx.strokeStyle=stroke;cx.lineWidth=.8;cx.stroke()}}
 function jet(){var f=cx;
@@ -360,7 +367,7 @@ function draw(){var c=cx;c.save();if(sh>0)c.translate(R(-1,1)*sh*.35,R(-1,1)*sh*
   SM.forEach(function(p){var a=p.op*Math.max(0,p.l/p.m),k=p.c,g=c.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);g.addColorStop(0,"rgba("+k+","+k+","+k+","+a+")");g.addColorStop(1,"rgba("+k+","+k+","+k+",0)");c.fillStyle=g;c.beginPath();c.arc(p.x,p.y,p.r,0,6.283);c.fill()});
   T.forEach(drawT);PL.forEach(drawPL);MS.forEach(drawM);
   DB.forEach(function(d){c.save();c.translate(d.x,d.y);c.rotate(d.r);c.fillStyle="#262b34";c.fillRect(-d.s,-d.s*.5,d.s*2,d.s);c.restore()});
-  drawFX();c.restore();
+  drawFX();drawFW();c.restore();
   if(fl>0){var g=c.createRadialGradient(W/2,H/2,H*.3,W/2,H/2,Math.max(W,H)*.75);g.addColorStop(0,"rgba(255,40,40,0)");g.addColorStop(1,"rgba(255,40,40,"+Math.min(.55,fl/34*.55)+")");c.fillStyle=g;c.fillRect(0,0,W,H)}}
 function sPop(){if(!sOn())return;var t=AC.currentTime;nz(t,.25,"bandpass",1200,300,.8,.5,.005);tone(t,.12,220,80,"sine",.4)}
 function sCapt(){if(!sOn())return;var t=AC.currentTime;tone(t,.14,523,523,"triangle",.18);tone(t+.15,.14,659,659,"triangle",.18);tone(t+.3,.3,784,784,"triangle",.18)}
@@ -461,6 +468,21 @@ function applyAnim(){document.documentElement.classList.toggle("noanim",P.anim==
 $("anim").onclick=function(){P.anim=P.anim===false;sv();lab();applyAnim()};
 var wasD=isDesk();window.addEventListener("resize",function(){var n=isDesk();if(n!==wasD){wasD=n;rt()}});
 xSetup();rt();
+var FW=[],FS=[];
+function sFWLaunch(){if(!sOn())return;var t=AC.currentTime;nz(t,.7,"bandpass",350,2200,1.2,.35,.05)}
+function sFWBurst(){if(!sOn())return;var t=AC.currentTime,i;nz(t,.55,"lowpass",2000,160,.7,.7,.003);tone(t,.35,170,45,"sine",.5);for(i=0;i<9;i++)nz(t+.08+Math.random()*.7,.05,"highpass",3500,7000,.8,.14,.001)}
+function fireworks(x,y){if(FW.length>=6)return;FW.push({x:x+R(-10,10),y:GY-6,ty:Math.min(y,GY-60),vy:-R(8,10.5)*SC,h:R(0,360),f:0});sFWLaunch()}
+function burst(x,y,h){var type=Math.floor(R(0,4)),n=type===1?70:type===2?60:95,i,a,sp,h2;sFWBurst();FX.push({k:"flash",x:x,y:y,l:10,m:10});
+  for(i=0;i<n;i++){a=type===1?i/n*6.283:R(0,6.283);sp=type===1?R(3.2,3.6):type===0?R(1,4.4):type===2?R(1.2,3.2):R(1.5,4);
+    h2=type===2?R(35,50):type===3?h+R(-60,60):(Math.random()<.2?h+180:h+R(-14,14));
+    FS.push({x:x,y:y,vx:Math.cos(a)*sp*SC,vy:Math.sin(a)*sp*SC,l:type===2?R(90,140):R(48,85),h:(h2+720)%360,g:type===2?.035:.05,t:type})}}
+function stepFW(){FW.forEach(function(s){s.f++;s.y+=s.vy;s.vy*=.985;FS.push({x:s.x,y:s.y,vx:R(-.2,.2),vy:R(.3,1),l:R(10,20),h:40,g:.02,t:9});if(s.y<=s.ty||Math.abs(s.vy)<2){s.done=1;burst(s.x,s.y,s.h)}});
+  FW=FW.filter(function(s){return !s.done});
+  FS.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.vx*=.985;p.vy=p.vy*.985+p.g;p.l--});FS=FS.filter(function(p){return p.l>0});if(FS.length>900)FS.splice(0,FS.length-900)}
+function drawFW(){if(!FW.length&&!FS.length)return;var c=cx;c.save();c.globalCompositeOperation=EL<.15?"lighter":"source-over";
+  FW.forEach(function(s){c.fillStyle="#fff7d0";c.beginPath();c.arc(s.x,s.y,2.2*SC,0,6.283);c.fill()});
+  FS.forEach(function(p){var a=Math.min(1,p.l/(p.t===9?10:30));if(p.t===2)a*=.6+.4*Math.random();c.strokeStyle="hsla("+p.h+",100%,"+(p.t===9?65:62)+"%,"+a+")";c.lineWidth=(p.t===9?1.6:2.8)*SC;c.beginPath();c.moveTo(p.x,p.y);c.lineTo(p.x-p.vx*3,p.y-p.vy*3);c.stroke()});c.restore()}
+document.addEventListener("contextmenu",function(e){if(document.getElementById("splash")||P.anim===false)return;if(e.target.closest&&e.target.closest("button,select,input,label,a,textarea,option,summary,#cfgp"))return;e.preventDefault();if(!$("cfgp").classList.contains("hide"))return;fireworks(e.clientX,e.clientY)});
 var RUN=0;function loop(){if(P.anim===false){RUN=0;return}step();draw();requestAnimationFrame(loop)}
 function startLoop(){if(!RUN&&P.anim!==false){RUN=1;requestAnimationFrame(loop)}}
 var AC=null,MG=null,NB=null;if(P.vm==null)P.vm=.45;if(P.vs==null)P.vs=.25;
