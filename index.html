@@ -227,20 +227,31 @@ function rt(){var d=isDesk();["play","exam","topic","list","stats"].forEach(func
   [].forEach.call(document.querySelectorAll(".tabs button"),function(b){var x=b.dataset.t;b.classList.toggle("on",d?(x===LT||x===RT):x===CT)});
   var vs=d?[LT,RT]:[CT];if(vs.indexOf("topic")>=0)topics();if(vs.indexOf("list")>=0)list();if(vs.indexOf("stats")>=0)stats();if(vs.indexOf("play")<0)stop()}
 var CUR=null;
-var TP=[{"s":1,"g":"","i":[["1.1","Ernesto – Evgeny",[1,23,24,25,49,50,78,105,106]],["1.2","Pskov và Veliky Novgorod",[2,3,26,51,52,79,107,108]],["1.3","Sanatorium (khu nghỉ dưỡng, điều dưỡng)",[4,5,27,28,29,53,80,81,82,109,110]],["1.4","Alexander Borodin",[6,7,30,31,54,83,111]],["1.5","Truyền hình và báo chí",[8,32,55,56,57,84,85]],["1.6","Carlos và Lena",[9,33,34,58,59,86,112,113]],["1.7","Bức chân dung gia đình",[10,35,60,61,62,63,64,87,88,89,90,91,114]],["1.8","Trung tâm thương mại GUM",[11,36,65,92,93,115,116]],["1.9","Mozart",[12,37,66,67,68,94,117,118]],["1.10","Rachmaninov",[13,14,38,39,69,95,119]],["1.11","Tiểu sử người phụ nữ / Bồ Đào Nha",[15,16,40,41,70,96,120,121]],["1.12","Moskva",[17,42,43,71,97,122,123,124,125]],["1.13","Chuyến thăm Kirill",[18,19,44,72,98,126]],["1.14","Chuyến du lịch Iceland",[20,45,73,74,99,100,127,128]],["1.15","Amsterdam",[21,46,75,76,101,102,129]],["1.16","Arnold và Francesca",[22,47,48,77,103,104,130]]]},{"s":2,"g":"","i":[["2.1","Peterburg – Питер",[1,42,47]],["2.2","Chuyến tham quan – Экскурсия",[2,3,18,22,61]],["2.3","Nina – Нина",[4,5,6,32,48,62]],["2.4","Bà / người bà",[7,24,31,38,43]],["2.5","Amsterdam",[8,9,10,28,44,45,49]],["2.6","Tiểu sử người phụ nữ / Bồ Đào Nha",[11,50,63,64,68,69]],["2.7","Một ngày làm việc của cô giáo",[12,25,26,35,56,58]],["2.8","Zvenigorod",[13,14,15,27,29,33,34,46]],["2.9","Maria – học tập và làm thêm",[16,17,37,57,59,60]],["2.10","Cuộc sống ở làng quê và ngôi nhà mới",[19,20,21,36,39,55]],["2.11","Dmitry và Alexander – thể thao",[23,40,54,66,67]],["2.12","Misha bị ốm",[30,41,51,52,53,65]]]}];
+var TP=[{"s":1,"g":"","i":[["1.1","Ernesto – Evgeny",[1,23,24,25,49,50,78,105,106]],["1.2","Pskov và Veliky Novgorod",[2,3,26,51,52,79,107,108]],["1.3","Sanatorium (khu nghỉ dưỡng, điều dưỡng)",[4,5,27,28,29,53,80,81,82,109,110]],["1.4","Alexander Borodin",[6,7,30,31,54,83,111]],["1.6","Carlos và Lena",[9,33,34,58,59,86,112,113]],["1.7","Bức chân dung gia đình",[10,35,60,61,62,63,64,87,88,89,90,91,114]],["1.9","Mozart",[12,37,66,67,68,94,117,118]],["1.10","Rachmaninov",[13,14,38,39,69,95,119]],["1.11","Tiểu sử người phụ nữ / Bồ Đào Nha",[15,16,40,41,70,96,120,121],true],["1.14","Chuyến du lịch Iceland",[20,45,73,74,99,100,127,128],true]]},{"s":2,"g":"","i":[["2.1","Peterburg – Питер",[1,42,47],true],["2.2","Chuyến tham quan – Экскурсия",[2,3,18,22,61],true],["2.4","Bà / người bà",[7,24,31,38,43]],["2.5","Amsterdam",[8,9,10,28,44,45,49],true],["2.6","Tiểu sử người phụ nữ / Bồ Đào Nha",[11,50,63,64,68,69],true],["2.8","Zvenigorod",[13,14,15,27,29,33,34,46]],["2.10","Cuộc sống ở làng quê và ngôi nhà mới",[19,20,21,36,39,55],true],["2.11","Dmitry và Alexander – thể thao",[23,40,54,66,67]]]}];
 var UN=[];
 function qch(s,qs){return qs.map(function(n){var d=D.filter(function(x){return x.s===s&&x.n===n})[0];if(!d)return "";var l=last(d);return '<button class="'+(l===1?"ok":l===0?"bad":"")+'" data-id="'+id(d)+'">'+n+'</button>'}).join("")}
 var TS=1;
-function topics(){var h='<div class="stabs"><button data-ts="1"'+(TS===1?' class="on"':'')+'>Nghe 1</button><button data-ts="2"'+(TS===2?' class="on"':'')+'>Nghe 2</button></div>';
+function topicCard(g,gi,it,ii){
+  var ids=it[2].map(function(n){return g.s+"-"+n}),ok=ids.filter(function(k){var x=P.st[k];return x&&x.l===1}).length;
+  return '<div class="tp"><div><span class="code">'+it[0]+'</span><b>'+esc(it[1])+'</b>'+(it[3]?' <span class="small">⚠️ chưa xác minh</span>':'')+'</div><div class="small">Câu: '+it[2].length+' · đang đúng '+ok+'/'+it[2].length+'</div><div class="chips">'+qch(g.s,it[2])+'</div><button class="p" data-top="'+gi+'-'+ii+'" data-m="quiz">📝 Trắc nghiệm</button> <button data-top="'+gi+'-'+ii+'" data-m="self">Tự kiểm tra</button> <button data-ex="'+gi+'-'+ii+'">⏱ Thi thử</button></div>';
+}
+function topics(){
+  var h='<div class="stabs"><button data-ts="1"'+(TS===1?' class="on"':'')+'>Nghe 1</button><button data-ts="2"'+(TS===2?' class="on"':'')+'>Nghe 2</button></div>';
   TP.forEach(function(g,gi){
     if(g.s!==TS)return;
     h+=(g.g?'<h3>'+esc(g.g)+'</h3>':'')+(g.w?'<div class="warn">⚠️ '+esc(g.w)+'</div>':'');
-    g.i.forEach(function(it,ii){var ids=it[2].map(function(n){return g.s+"-"+n}),ok=ids.filter(function(k){var x=P.st[k];return x&&x.l===1}).length;
-      h+='<div class="tp"><div><span class="code">'+it[0]+'</span><b>'+esc(it[1])+'</b>'+(it[3]?' <span class="small">⚠️ chưa xác minh</span>':'')+'</div><div class="small">Câu: '+it[2].length+' · đang đúng '+ok+'/'+it[2].length+'</div><div class="chips">'+qch(g.s,it[2])+'</div><button class="p" data-top="'+gi+'-'+ii+'" data-m="quiz">📝 Trắc nghiệm</button> <button data-top="'+gi+'-'+ii+'" data-m="self">Tự kiểm tra</button> <button data-ex="'+gi+'-'+ii+'">⏱ Thi thử</button></div>'})});
+    g.i.forEach(function(it,ii){if(!it[4])h+=topicCard(g,gi,it,ii)});
+    var hasExtra=g.i.some(function(it){return !!it[4]});
+    if(hasExtra){
+      h+='<h2>📚 Có thể học thêm</h2><p class="small">Các chủ đề này được tách riêng khỏi danh sách chính để ôn tập bổ sung.</p>';
+      g.i.forEach(function(it,ii){if(it[4])h+=topicCard(g,gi,it,ii)});
+    }
+  });
   if(UN.length)h+='<h2>Câu chưa xác định chắc chắn</h2><div class="warn">Các câu dưới đây không nên xem là đã ghép chắc chắn với bài nghe.</div>';
   UN.filter(function(u){return u.s===TS}).forEach(function(u){h+='<div class="tp"><div><b>Nghe '+u.s+' · câu '+u.q.join(", ")+'</b>'+(u.r?' <span class="small">('+esc(u.r)+')</span>':'')+'</div><div class="small">'+esc(u.n)+'</div><div class="chips">'+qch(u.s,u.q)+'</div></div>'});
-  h+='<h2>Cách ôn tập</h2>'+(TS===1?'<p><b>Nghe 1.</b> Ôn lần lượt các chủ đề từ 1.1 đến 1.16 theo thứ tự câu hỏi.</p>':'<p><b>Nghe 2.</b> Ôn lần lượt các chủ đề từ 2.1 đến 2.12; các chủ đề có dấu ⚠️ cần kiểm tra lại đáp án.</p>');
-  $("tpc").innerHTML=h}
+  h+='<h2>Cách ôn tập</h2>'+(TS===1?'<p><b>Nghe 1.</b> Ôn các chủ đề chính trước; mục “Có thể học thêm” chứa các chủ đề được tách riêng để ôn bổ sung.</p>':'<p><b>Nghe 2.</b> Ôn các chủ đề chính trước; mục “Có thể học thêm” chứa các chủ đề được tách riêng để ôn bổ sung. Các chủ đề có dấu ⚠️ cần kiểm tra lại đáp án.</p>');
+  $("tpc").innerHTML=h;
+}
 $("t-topic").onclick=function(e){var b=e.target.closest("button");if(!b)return;
   if(b.dataset.ts){TS=+b.dataset.ts;topics();return}
   if(b.dataset.top){var p=b.dataset.top.split("-"),g=TP[+p[0]],it=g.i[+p[1]];CUR={ids:it[2].map(function(n){return g.s+"-"+n})};
@@ -412,9 +423,15 @@ document.addEventListener("click",function(e){if(e.button>0)return;if(e.target.c
 var DM={};D.forEach(function(d){DM[id(d)]=d});
 function startCustom(label,ids,mode){CUR={ids:ids};var o=document.querySelector('#set option[value="topic"]');if(!o){o=document.createElement("option");o.value="topic";$("set").appendChild(o)}o.textContent=label;$("set").value="topic";$("ord").value="seq";$("mode").value=mode||"self";tab("play");build()}
 var E=null;
-function xTopicBox(){var h='<div id="xtp" class="hide" style="margin-top:8px"><div class="row" style="margin-bottom:6px"><button data-x="tall">Chọn tất cả</button><button data-x="tnone">Bỏ chọn</button><span class="small" id="xtc"></span></div><div style="max-height:260px;overflow:auto;border:1px solid var(--bd);border-radius:12px;padding:8px">',ps=0;
-  TP.forEach(function(g,gi){if(g.s!==ps){ps=g.s;h+='<b>Nghe '+g.s+'</b>'}
-    g.i.forEach(function(it,ii){h+='<label class="sw" style="margin:2px 0"><input type="checkbox" data-tp="'+gi+'-'+ii+'"> <span><b>'+it[0]+'</b> '+esc(it[1])+(it[3]?' ⚠️':'')+' <span class="small">('+it[2].length+' câu)</span></span></label>'})});
+function xTopicBox(){var h='<div id="xtp" class="hide" style="margin-top:8px"><div class="row" style="margin-bottom:6px"><button data-x="tall">Chọn tất cả</button><button data-x="tnone">Bỏ chọn</button><span class="small" id="xtc"></span></div><div style="max-height:260px;overflow:auto;border:1px solid var(--bd);border-radius:12px;padding:8px">';
+  TP.forEach(function(g,gi){
+    h+='<b style="display:block;margin:5px 0">Nghe '+g.s+' · Chủ đề chính</b>';
+    g.i.forEach(function(it,ii){if(!it[4])h+='<label class="sw" style="margin:2px 0"><input type="checkbox" data-tp="'+gi+'-'+ii+'"> <span><b>'+it[0]+'</b> '+esc(it[1])+(it[3]?' ⚠️':'')+' <span class="small">('+it[2].length+' câu)</span></span></label>'});
+    if(g.i.some(function(it){return !!it[4]})){
+      h+='<b style="display:block;margin:9px 0 3px">Nghe '+g.s+' · Có thể học thêm</b>';
+      g.i.forEach(function(it,ii){if(it[4])h+='<label class="sw" style="margin:2px 0"><input type="checkbox" data-tp="'+gi+'-'+ii+'"> <span><b>'+it[0]+'</b> '+esc(it[1])+(it[3]?' ⚠️':'')+' <span class="small">('+it[2].length+' câu)</span></span></label>'});
+    }
+  });
   return h+'</div></div>'}
 function xSel(){var seen={},ids=[];[].forEach.call(document.querySelectorAll("#xtp input:checked"),function(c){var p=c.dataset.tp.split("-"),g=TP[+p[0]],it=g.i[+p[1]];it[2].forEach(function(n){var k=g.s+"-"+n;if(!seen[k]){seen[k]=1;ids.push(k)}})});return ids}
 function xCount(){var el=$("xtc");if(el)el.textContent=document.querySelectorAll("#xtp input:checked").length+" chủ đề · "+xSel().length+" câu"}
